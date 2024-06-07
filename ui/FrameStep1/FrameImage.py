@@ -24,7 +24,11 @@ class ImageWidget(QFrame):
     def set_image(self, image_path):
         if isinstance(image_path, str):
             pixmap = QPixmap(image_path)
-            self.image_label.setPixmap(pixmap)
+            if not pixmap.isNull():
+                scaled_pixmap = pixmap.scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Ajusta el tamaño según tus necesidades
+                self.image_label.setPixmap(scaled_pixmap)
+            else:
+                print(f"Error: Failed to load image from {image_path}")
         else:
             print("Error: image_path is not a string")
 

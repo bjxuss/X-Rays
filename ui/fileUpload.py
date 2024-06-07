@@ -91,7 +91,7 @@ class FrameFileUpload(QWidget):
         
     @Slot()
     def open_file(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "Seleccionar archivo JPG", "", "Archivos JPEG (*.jpeg)")
+        filename, _ = QFileDialog.getOpenFileName(self, "Seleccionar archivo JPG", "", "Archivos JPEG (*.jpeg);;Archivos JPG (*.jpg);; Archivos PNG (*.png)")
         if filename:
             self.enabled = True
             self.lbl_file_selected.setText(f"{filename}")
