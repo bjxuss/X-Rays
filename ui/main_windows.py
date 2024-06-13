@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import QMainWindow, QApplication, QStackedWidget
 from PySide6.QtGui import QScreen
 
-from ui.fileUpload import FrameFileUpload
-from ui.installerMenu import Menu
+
+from ui.frame1 import Frame1
+from ui.BonesFracture.installerMenu import MenuFracture
+from ui.Pneumonia.installerMenu2 import MenuPneumonia
 
 
 
@@ -18,26 +20,36 @@ class MainWindow(QMainWindow):
         self.apilacion_widgets = QStackedWidget(self)
 
         # frames or pages
-        self.frame_load_file = FrameFileUpload()
+        # self.frame_load_file = FrameFileUpload()
         
 
-        self.apilacion_widgets.addWidget(self.frame_load_file)
+        self.instance_of_frame1 = Frame1()
+        self.apilacion_widgets.addWidget(self.instance_of_frame1)
+        # self.apilacion_widgets.addWidget(self.frame_load_file)
 
         self.setCentralWidget(self.apilacion_widgets)
-        self.apilacion_widgets.setCurrentWidget(self.frame_load_file) # aquí modifico la ventana que se mostrará primero 
+        self.apilacion_widgets.setCurrentWidget(self.instance_of_frame1) # aquí modifico la ventana que se mostrará primero 
 
         self.conexiones()
 
     def conexiones(self):
-        self.frame_load_file.btn_submit_file.clicked.connect(self.change_frame2)
+        # self.frame_load_file.btn_submit_file.clicked.connect(self.change_frame2)
+        self.instance_of_frame1.button1.clicked.connect(self.change_frame2)
+        self.instance_of_frame1.button2.clicked.connect(self.change_frame3)
 
     def change_frame2(self):
-        self.frame2 = Menu()
-        self.apilacion_widgets.addWidget(self.frame2)
+        self.instance_of_menu_bones_fracture = MenuFracture()
+        self.apilacion_widgets.addWidget(self.instance_of_menu_bones_fracture)
 
-        self.apilacion_widgets.setCurrentWidget(self.frame2)
+        self.apilacion_widgets.setCurrentWidget(self.instance_of_menu_bones_fracture)
+    
+    def change_frame3(self):
+        self.instance_of_menu_pneumonia = MenuPneumonia()
+        self.apilacion_widgets.addWidget(self.instance_of_menu_pneumonia)
 
-        self.frame2.fill_values_in_input_parameters()
+        self.apilacion_widgets.setCurrentWidget(self.instance_of_menu_pneumonia)
+
+        
     
 
     def center_windows(self):

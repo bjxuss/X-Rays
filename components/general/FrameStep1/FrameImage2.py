@@ -2,13 +2,16 @@ from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QFrame
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 
-from entity.parametros import Parametro
+from entity.parametro2 import Parametro2
 
-class ValidateFrame(QFrame):
+
+
+class ImageWidgetPneumonia(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setup_ui()
         self.setGeometry(10, 10, 350, 350)  # Ajusta el tamaño según tus necesidades
+        
 
     def setup_ui(self):
         layout = QVBoxLayout(self)
@@ -21,28 +24,24 @@ class ValidateFrame(QFrame):
         layout.addWidget(self.image_label)
     
     def set_image(self, image_path):
-        pixmap = QPixmap(image_path)
-        
-        # Escalar el pixmap para ajustarlo al tamaño del QLabel sin cambiar la relación de aspecto
-        scaled_pixmap = pixmap.scaled(self.image_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.image_label.setPixmap(scaled_pixmap)
+        if isinstance(image_path, str):
+            pixmap = QPixmap(image_path)
+            if not pixmap.isNull():
+                scaled_pixmap = pixmap.scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Ajusta el tamaño según tus necesidades
+                self.image_label.setPixmap(scaled_pixmap)
+            else:
+                print(f"Error: Failed to load image from {image_path}")
+        else:
+            print("Error: image_path is not a string")
 
-        self.image_label.setStyleSheet("width: 50%; height: 50%;")
 
     def resizeEvent(self, event):
-        # Redimensionar la imagen cuando se redimensione el QLabel
-        if not self.image_label.pixmap().isNull():
-            self.set_image(self.image_label)
+        self.set_image(Parametro2.get_instance().path2)
         super().resizeEvent(event)
 
     def fill_values(self):
-        self.instance_of_parameters = Parametro().get_instance()
+        self.instance_of_parameters = Parametro2().get_instance()
         print(f"fill_values: --> {self.instance_of_parameters}")
         
         # Llenamos las etiquetas con los resultados de las entradas, salidas y parámetros
-        self.set_image(self.instance_of_parameters.path)
-
-        
-
-    
-
+        self.set_image(self.instance_of_parameters.path2)

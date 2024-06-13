@@ -4,7 +4,6 @@ import torch.nn as nn  # biblioteca para redes neuronales
 import torch.optim as optim # biblioteca para optimizacion
 import cv2  # biblioteca para vision computacional
 
-
 def get_device(): # Verificar disponibilidad de GPU
     if torch.cuda.is_available():
         device = torch.device("cuda")

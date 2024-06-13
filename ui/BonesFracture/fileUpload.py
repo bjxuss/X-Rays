@@ -1,28 +1,20 @@
-# Import dependencies
 from PySide6.QtWidgets import QWidget, QPushButton, QFrame, QLabel, QApplication, QFileDialog
 from PySide6.QtCore import Qt, Slot
 
 from components.general.subtitle import SubTittle
 from entity.parametros import Parametro
-
-
-# Import Module
-
-# from entity.parametros import Parametro
-# from logic.excel.get_data_excel_file import *
-# from ui.frame2.frame2 import Frame2
+from ui.BonesFracture.installerMenu import MenuFracture
 
 class FrameFileUpload(QWidget):
     def __init__(self):
         super().__init__()
         self.widgets()
-    #     self.frame2_instance = Frame2()
+        self.enabled = False  # Inicializar el estado de habilitación
 
     def widgets(self):
         screen_geometry = QApplication.primaryScreen().availableGeometry()
         self.main_frame = QFrame(self)
         self.main_frame.setGeometry(screen_geometry)
-
 
         SubTittle(410, 180, 400, 50, "Seleccione un archivo(.png o .jpg)", self)
 
@@ -38,7 +30,7 @@ class FrameFileUpload(QWidget):
                 border-radius: 10px;
             }
             QPushButton:hover {
-                background-color: #AF0507; /* Cambia el color al pasar el mouse */
+                background-color: #AF0507;
             }
             """
         )
@@ -62,7 +54,7 @@ class FrameFileUpload(QWidget):
                 border-radius: 10px;
             }
             QPushButton:hover {
-                background-color: #AF0507; /* Cambia el color al pasar el mouse */
+                background-color: #AF0507;
             }
             """
         )
@@ -72,37 +64,45 @@ class FrameFileUpload(QWidget):
     def update_submit_button(self):
         if self.enabled:
             self.btn_submit_file.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #32A207;
-                color: #FFFFFF;
-                border: none;
-                font-size: 22px;
-                font-weight: bold;
-                border-radius: 10px;
-            }
-            QPushButton:hover {
-                background-color: #278302; /* Cambia el color al pasar el mouse */
-            }
-            """
+                """
+                QPushButton {
+                    background-color: #32A207;
+                    color: #FFFFFF;
+                    border: none;
+                    font-size: 22px;
+                    font-weight: bold;
+                    border-radius: 10px;
+                }
+                QPushButton:hover {
+                    background-color: #278302;
+                }
+                """
             )
             self.btn_submit_file.setCursor(Qt.PointingHandCursor)
             self.btn_submit_file.setEnabled(True)
-        
+
     @Slot()
     def open_file(self):
         filename, _ = QFileDialog.getOpenFileName(self, "Seleccionar archivo JPG", "", "Archivos JPEG (*.jpeg);;Archivos JPG (*.jpg);; Archivos PNG (*.png)")
         if filename:
             self.enabled = True
-            self.lbl_file_selected.setText(f"{filename}")
-            self.update_submit_button() 
+            self.lbl_file_selected.setText(filename)  # Aquí se actualiza la etiqueta con el nombre del archivo
+            Parametro.get_instance().path = filename  # Guardar el nombre del archivo en el parámetro
+            self.update_submit_button()
             print(f"{filename}")
-    
+
     @Slot()
     def acept_submit(self):
         filename = self.lbl_file_selected.text()
+        print(f"file {filename}")
 
-        parametro = Parametro.get_instance(path=filename)
+        self.step2 = MenuFracture()
+        self.step2.fill_values_in_input_parameters()
 
-        print(f"Llenado de datos: {parametro}")
+
+
+        # parametro = Parametro.get_instance(path=filename)
+
+
+        # print(f"Llenado de datos: {parametro}")
     

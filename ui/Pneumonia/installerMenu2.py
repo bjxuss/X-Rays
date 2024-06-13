@@ -2,17 +2,21 @@ import sys
 from PySide6.QtWidgets import QFrame, QMainWindow, QWidget, QVBoxLayout, QPushButton, QStackedWidget, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve
 
-from entity.parametros import Parametro
-from ui.FrameStep1.FrameImage import ImageWidget
-from ui.FrameStep2.FrameValidate import ValidateFrame
+from components.general.FrameStep1.FrameImage2 import ImageWidgetPneumonia
+from components.general.FrameStep2.FrameValidate2 import ValidateFramePneumonia
+from entity.parametro2 import Parametro2
 
-class Menu(QMainWindow):
+
+
+
+
+class MenuPneumonia(QWidget):
     def __init__(self):
-        super(Menu, self).__init__()
+        super(MenuPneumonia, self).__init__()
         
         self.setWindowTitle("Instalador")
         self.setGeometry(100, 100, 800, 600)
-        print("File --> ", Parametro.get_instance().path)
+        print("File --> ", Parametro2.get_instance().path2)
 
         # Estilo de la ventana
         self.setStyleSheet("""
@@ -46,9 +50,8 @@ class Menu(QMainWindow):
         """)
 
         # Configuración del widget principal y layout
-        self.main_widget = QWidget()
-        self.setCentralWidget(self.main_widget)
-        self.layout = QHBoxLayout(self.main_widget)
+        
+        self.layout = QHBoxLayout(self)
 
         # Menú de botones
         self.menu_buttons = QVBoxLayout()
@@ -65,18 +68,23 @@ class Menu(QMainWindow):
         self.stacked_widget = QStackedWidget()
         self.layout.addWidget(self.stacked_widget)
 
-        self.instance_image = ImageWidget()
-        self.instance_image.set_image(Parametro.get_instance().path)
+        from ui.Pneumonia.fileUpload2 import FrameFileUploadPneumonia
+        self.instance_file_upload = FrameFileUploadPneumonia()
+
+
+        self.instance_image = ImageWidgetPneumonia()
+        self.instance_image.set_image(Parametro2.get_instance().path2)
         print(f"Instance image --> {self.instance_image}")
 
-        self.instance_validate = ValidateFrame()
+        self.instance_validate = ValidateFramePneumonia()
 
         # Agregar páginas al stacked widget
-        self.stacked_widget.addWidget(self.create_page("Bienvenido al Instalador", self.instance_image, 0, True, False))
-        self.stacked_widget.addWidget(self.create_page("Configuración Paso 1", self.instance_image, 1, True, True))
-        self.stacked_widget.addWidget(self.create_page("Configuración Paso 2", self.instance_validate, 2, True, True))
-        self.stacked_widget.addWidget(self.create_page("Proceso de Instalación", self.instance_validate, 3, True, True))
-        self.stacked_widget.addWidget(self.create_page("Instalación Completa", None, 4, False, True))
+        self.stacked_widget.addWidget(self.create_page("Bienvenido al Instalador",None, self.instance_image, 0, True, False))
+        self.stacked_widget.addWidget(self.create_page("Configuración Paso 1",self.instance_file_upload,None, 1, True, True))
+        self.stacked_widget.addWidget(self.create_page("Configuracion Paso 2",None, self.instance_image, 3, True, True))
+        self.stacked_widget.addWidget(self.create_final_page("Proceso de instalación",  2, True, True))
+        self.stacked_widget.addWidget(self.create_page("Instalación completa",None, None, 3, True, True))
+        self.stacked_widget.addWidget(self.create_page("Instalación Completa", None, None, 4, False, True))
 
         # Actualizar estado de botones
         self.update_menu_buttons()
@@ -102,6 +110,12 @@ class Menu(QMainWindow):
 
         # Actualizar estado de botones
         self.update_menu_buttons()
+
+        
+
+        # Llenar los valores de predicción si estamos en la página final
+        if index == 2:
+            self.instance_validate.fill_values_output()
 
     def animate_transition(self, next_page, direction):
         animation = QPropertyAnimation(next_page, b"pos")
@@ -130,13 +144,17 @@ class Menu(QMainWindow):
                 button.setObjectName("pending")
             button.setStyle(self.style())
 
-    def create_page(self, text, widget, index, has_next, has_back):
+    def create_page(self, text, fileUpload ,widget, index, has_next, has_back):
         page = QWidget()
         layout = QVBoxLayout(page)
 
         # Crear y configurar un QLabel
         label = QLabel(text, alignment=Qt.AlignCenter)
         layout.addWidget(label)
+
+        #Añadir el widget de subida de archivos
+        if fileUpload:
+            layout.addWidget(fileUpload)
 
         # Añadir el widget (imagen o validación)
         if widget:
@@ -154,6 +172,8 @@ class Menu(QMainWindow):
             next_button.clicked.connect(lambda: self.switch_page(index + 1))
             nav_layout.addWidget(next_button)
         else:
+
+            
             finish_button = QPushButton("Finalizar")
             finish_button.clicked.connect(self.close)
             nav_layout.addWidget(finish_button)
@@ -161,9 +181,35 @@ class Menu(QMainWindow):
         layout.addLayout(nav_layout)
 
         return page
+    
+    def create_final_page(self, text, index, has_next, has_back):
+        page = QWidget()
+        layout = QVBoxLayout(page)
+
+        # Crear y configurar un QLabel
+        label = QLabel(text, alignment=Qt.AlignCenter)
+        layout.addWidget(label)
+
+        # Añadir el widget de validación
+        layout.addWidget(self.instance_validate)
+
+        # Botones de navegación
+        nav_layout = QHBoxLayout()
+        if has_back:
+            back_button = QPushButton("Atrás")
+            back_button.clicked.connect(lambda: self.switch_page(index - 1))
+            nav_layout.addWidget(back_button)
+
+        finish_button = QPushButton("Finalizar")
+        finish_button.clicked.connect(self.close)
+        nav_layout.addWidget(finish_button)
+
+        layout.addLayout(nav_layout)
+
+        return page
 
  
     def fill_values_in_input_parameters(self):
+        
         self.instance_image.fill_values()
-    
-    # def fill_value_in_output_parameter(self):
+        self.instance_validate.fill_values_output()
